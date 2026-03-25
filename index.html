@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phuket Badminton Pro v6.5</title>
+    <title>Phuket Badminton Pro v6.6</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
@@ -50,16 +50,16 @@
     </div>
 
 <script>
-// Твої гравці з фіксованими стартовими рейтингами
+// ПОВЕРНУТО ШКАЛУ 20-80
 const initialPlayers = [
-    { id: 1, name: 'Aleksey', rating: 1550, wins: 0, losses: 0 },
-    { id: 2, name: 'Maksym', rating: 1500, wins: 0, losses: 0 },
-    { id: 3, name: 'Victoria Admin', rating: 1450, wins: 0, losses: 0 },
-    { id: 4, name: 'Вита Лебедева', rating: 1450, wins: 0, losses: 0 },
-    { id: 5, name: 'Victoria Topalova', rating: 1400, wins: 0, losses: 0 },
-    { id: 6, name: 'Alla Meh', rating: 1350, wins: 0, losses: 0 },
-    { id: 7, name: 'Cleo', rating: 1200, wins: 0, losses: 0 },
-    { id: 8, name: 'Anna Sytenko', rating: 1100, wins: 0, losses: 0 }
+    { id: 1, name: 'Aleksey', rating: 80, wins: 0, losses: 0 },
+    { id: 2, name: 'Maksym', rating: 72, wins: 0, losses: 0 },
+    { id: 3, name: 'Victoria Admin', rating: 65, wins: 0, losses: 0 },
+    { id: 4, name: 'Вита Лебедева', rating: 65, wins: 0, losses: 0 },
+    { id: 5, name: 'Victoria Topalova', rating: 60, wins: 0, losses: 0 },
+    { id: 6, name: 'Alla Meh', rating: 50, wins: 0, losses: 0 },
+    { id: 7, name: 'Cleo', rating: 35, wins: 0, losses: 0 },
+    { id: 8, name: 'Anna Sytenko', rating: 20, wins: 0, losses: 0 }
 ];
 
 let players = JSON.parse(localStorage.getItem('pb_v6_players')) || initialPlayers;
@@ -86,10 +86,12 @@ function toggleSession() {
 }
 
 function finalizeSession() {
-    if (!confirm("Завершити ігровий день? Поточний рейтинг буде збережено як основний.")) return;
+    if (!confirm("Завершити ігровий день? Поточний рейтинг збережеться, але статистика перемог за день обнулиться.")) return;
     isSessionActive = false;
+    players.forEach(p => { p.wins = 0; p.losses = 0; });
+    history = [];
     save();
-    alert("День завершено. Рейтинги збережені!");
+    alert("День завершено. Рейтинги зафіксовано!");
     updateUI();
 }
 
@@ -141,9 +143,13 @@ function submitScore(cNum) {
     const avgA = (state.teamA[0].rating + state.teamA[1].rating) / 2;
     const avgB = (state.teamB[0].rating + state.teamB[1].rating) / 2;
 
-    const expectedA = 1 / (1 + Math.pow(10, (avgB - avgA) / 400));
+    // K-фактор підлаштований під шкалу 20-80
+    const K = 4.0; 
+    const expectedA = 1 / (1 + Math.pow(10, (avgB - avgA) / 40));
     const actualA = sA > sB ? 1 : (sA === sB ? 0.5 : 0);
-    const change = 32 * (actualA - expectedA);
+    const scoreDiff = Math.abs(sA - sB);
+    const marginMultiplier = Math.log2(scoreDiff + 1) * 0.5 + 0.5;
+    const change = K * (actualA - expectedA) * marginMultiplier;
 
     [...state.teamA, ...state.teamB].forEach(pRef => {
         let p = players.find(x => x.id === pRef.id);
@@ -163,7 +169,7 @@ function renderCourt(num) {
     const state = courtState[num];
     if (!container || !state.teamA.length) return;
     
-    // Округлення до цілого для відображення
+    // ОКРУГЛЕННЯ ДО ЦІЛОГО
     const sumA = (state.teamA[0].rating + state.teamA[1].rating).toFixed(0);
     const sumB = (state.teamB[0].rating + state.teamB[1].rating).toFixed(0);
 
@@ -189,7 +195,6 @@ function renderCourt(num) {
     `;
 }
 
-// Допоміжні функції
 function shuffleArray(arr) { let a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 function renderAll() { const root = document.getElementById('courts-root'); root.innerHTML = '<div id="court-card-1" class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden mb-6 active-court"></div><div id="court-card-2" class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden mb-6 active-court"></div>'; renderCourt(1); renderCourt(2); }
 function updateUI() { 
