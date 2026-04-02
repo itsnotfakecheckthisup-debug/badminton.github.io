@@ -3,43 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Badminton Session Manager</title>
+    <title>Badminton Manager FIXED</title>
     <style>
         *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:sans-serif;font-size:15px;background-color:#f4f4f9;color:#333;padding:10px}
-        h2{font-size:18px;font-weight:500;margin-bottom:1rem}
-        h3{font-size:16px;font-weight:500;margin-bottom:.75rem}
-        .card{background:#fff;border:0.5px solid #ddd;border-radius:12px;padding:1rem 1.25rem;margin-bottom:.75rem;box-shadow:0 2px 4px rgba(0,0,0,0.05)}
-        .btn{background:transparent;border:0.5px solid #ccc;border-radius:8px;padding:7px 14px;font-size:14px;cursor:pointer;color:#333}
-        .btn:hover{background:#f0f0f0}
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:15px;background-color:#f8f9fa;color:#212529;padding:15px}
+        h2, h3{margin-bottom:1rem;font-weight:600}
+        .card{background:#fff;border:1px solid #dee2e6;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 2px 4px rgba(0,0,0,0.05)}
+        .btn{display:inline-block;background:#fff;border:1px solid #ced4da;border-radius:8px;padding:8px 16px;font-size:14px;cursor:pointer;transition:0.2s}
+        .btn:hover{background:#e9ecef}
         .btn-primary{background:#007bff;border-color:#007bff;color:#fff}
+        .btn-primary:hover{background:#0069d9}
         .btn-success{background:#28a745;border-color:#28a745;color:#fff}
-        .btn-warning{background:#ffc107;border-color:#ffc107;color:#212529}
-        .btn-danger{background:#dc3545;border-color:#dc3545;color:#fff}
         .btn-sm{padding:4px 10px;font-size:13px}
-        .badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:12px;font-weight:500}
-        .badge-info{background:#d1ecf1;color:#0c5460}
-        .badge-success{background:#d4edda;color:#155724}
-        .badge-warning{background:#fff3cd;color:#856404}
-        .badge-danger{background:#f8d7da;color:#721c24}
-        input[type=text],input[type=number],select{border:0.5px solid #ddd;border-radius:6px;padding:6px 10px;font-size:14px;width:100%}
-        .player-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid #eee}
-        .player-row:last-child{border-bottom:none}
-        .avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0}
-        .rbar{flex:1;height:5px;background:#eee;border-radius:3px;overflow:hidden;margin:0 6px;min-width:40px}
+        .player-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f3f5}
+        .avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;flex-shrink:0}
+        .rbar{flex:1;height:6px;background:#e9ecef;border-radius:3px;overflow:hidden}
         .rfill{height:100%;border-radius:3px}
-        .court-block{border:1px solid #ddd;border-radius:12px;padding:1rem;margin-bottom:.75rem;background:#fff}
-        .team-box{flex:1;min-width:120px;padding:.5rem .75rem;border-radius:8px;background:#f8f9fa}
-        .score-inp{width:52px;text-align:center;font-size:18px;font-weight:500;padding:5px 4px;border:1px solid #ddd;border-radius:6px}
-        .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-        .tab-bar{display:flex;gap:4px;margin-bottom:1rem;border-bottom:1px solid #eee;padding-bottom:8px}
-        .tab{background:transparent;border:none;padding:6px 12px;font-size:14px;cursor:pointer;color:#666}
-        .tab.active{background:#eee;color:#000;font-weight:500;border-radius:6px}
-        .modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:200}
-        .modal{background:#fff;border-radius:12px;padding:1.5rem;width:320px;max-width:92vw;border:1px solid #ddd}
-        .slbl{font-size:11px;font-weight:500;color:#666;text-transform:uppercase;margin:.75rem 0 .35rem}
-        .delta-up{color:#28a745;font-size:12px;font-weight:500}
-        .delta-down{color:#dc3545;font-size:12px;font-weight:500}
+        .court-block{border:1px solid #dee2e6;border-radius:12px;padding:1.25rem;margin-bottom:1rem;background:#fff}
+        .team-box{flex:1;padding:10px;border-radius:8px;background:#f8f9fa;border:1px solid #eee;font-weight:500;text-align:center}
+        .score-inp{width:60px;text-align:center;font-size:20px;font-weight:bold;padding:8px;border:1px solid #ced4da;border-radius:8px}
+        .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+        .tab-bar{display:flex;gap:5px;margin-bottom:1rem;border-bottom:1px solid #dee2e6;padding-bottom:10px}
+        .tab{background:none;border:none;padding:8px 15px;cursor:pointer;color:#6c757d;border-radius:6px}
+        .tab.active{background:#e9ecef;color:#000;font-weight:bold}
     </style>
 </head>
 <body>
@@ -47,243 +33,152 @@
 <div id="app"></div>
 
 <script>
-/* ── ПОЧАТКОВІ ДАНІ ── */
+/* ── КОНСТАНТИ ТА БАЗА ── */
 const INIT_PLAYERS = [
-  {id:1,name:'Aleksey',    rating:80},
-  {id:2,name:'Maksym',     rating:72},
-  {id:3,name:'Victoria A', rating:65},
-  {id:4,name:'Vita L',     rating:65},
-  {id:5,name:'Victoria T', rating:60},
-  {id:6,name:'Alla',       rating:50},
-  {id:7,name:'Cleo',       rating:35},
-  {id:8,name:'Anna',       rating:20},
+    {id:1,name:'Aleksey',rating:80},{id:2,name:'Maksym',rating:72},
+    {id:3,name:'Victoria A',rating:65},{id:4,name:'Vita L',rating:65},
+    {id:5,name:'Victoria T',rating:60},{id:6,name:'Alla',rating:50},
+    {id:7,name:'Cleo',rating:35},{id:8,name:'Anna',rating:20}
 ];
 
-/* ── РОБОТА З БАЗОЮ ДАНИХ ── */
-function freshDB(){
-  return {
-    players: INIT_PLAYERS.map(p=>({...p,gamesPlayed:0,wins:0,losses:0})),
-    sessions:[], nextId:9
-  };
-}
-function loadDB(){
-  try{ const r=localStorage.getItem('bmt_v5'); if(r) return JSON.parse(r); }catch(e){}
-  return freshDB();
-}
-function saveDB(){ try{localStorage.setItem('bmt_v5',JSON.stringify(db));}catch(e){} }
+let db = (function(){
+    try {
+        const saved = localStorage.getItem('bmt_v6');
+        if(saved) return JSON.parse(saved);
+    } catch(e) {}
+    return {
+        players: INIT_PLAYERS.map(p => ({...p, gamesPlayed:0, wins:0, losses:0})),
+        sessions: [], nextId: 9
+    };
+})();
 
-let db = loadDB();
 let ses = null; 
-let tab = 'courts';
-let modal = null;
 let screen = 'home';
+let tab = 'courts';
 
-/* ── ДОПОМІЖНІ ФУНКЦІЇ ── */
-function GP(id){ return db.players.find(p=>p.id===id)||{name:'?',rating:50,wins:0,losses:0,gamesPlayed:0}; }
-function GR(id){ return GP(id).rating; }
-function GN(id){ return GP(id).name; }
-function tavg(ids){ return ids.reduce((s,id)=>s+GR(id),0)/ids.length; }
-function ini(n){ return n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
-function abg(r){ return r>=65?'#E1F5EE':r>=45?'#FAEEDA':'#FCEBEB'; }
-function afg(r){ return r>=65?'#0F6E56':r>=45?'#854F0B':'#A32D2D'; }
-function rc(r){  return r>=65?'#1D9E75':r>=45?'#BA7517':'#E24B4A'; }
-function rbadge(r){ return r>=65?'badge-success':r>=45?'badge-warning':'badge-danger'; }
-function rlbl(r){ return r>=65?'Сильний':r>=45?'Середній':'Початківець'; }
-function pk(a,b){ return [a,b].sort((x,y)=>x-y).join('-'); }
-function mk(t1,t2){ return [[...t1].sort().join(','),[...t2].sort().join(',')].sort().join('|'); }
+/* ── ДОПОМІЖНІ ФУНКЦІЇ (Оголошуємо на початку) ── */
+const saveDB = () => localStorage.setItem('bmt_v6', JSON.stringify(db));
+const GP = (id) => db.players.find(p => p.id === id) || {name: '?', rating: 50};
+const GN = (id) => GP(id).name;
+const GR = (id) => GP(id).rating;
+const tavg = (ids) => ids.reduce((s, id) => s + GR(id), 0) / ids.length;
+const ini = (n) => n.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+const rc = (r) => r >= 65 ? '#1D9E75' : r >= 45 ? '#BA7517' : '#E24B4A';
+const pk = (a, b) => [a, b].sort((x, y) => x - y).join('-');
+const mk = (t1, t2) => [[...t1].sort().join(','), [...t2].sort().join(',')].sort().join('|');
 
-/* ── АЛГОРИТМ ПАРУВАННЯ ── */
-function makePairings(playerIds, numCourts){
-  const pp = ses ? ses.prevPairs : [];
-  const pm = ses ? ses.prevMatches : [];
+/* ── АЛГОРИТМ ── */
+function makePairings(playerIds, numCourts) {
+    const pp = ses ? ses.prevPairs : [];
+    const pm = ses ? ses.prevMatches : [];
+    const sorted = [...playerIds].sort((a, b) => GR(b) - GR(a));
+    
+    const maxOnCourts = Math.min(numCourts * 4, Math.floor(sorted.length / 4) * 4);
+    const activeIds = sorted.slice(0, maxOnCourts);
+    const waitingIds = sorted.slice(maxOnCourts);
 
-  const sorted = [...playerIds].map(id=>({id,r:GR(id)})).sort((a,b)=>b.r-a.r);
-  const maxOnCourts = numCourts * 4;
-  const activePool = sorted.slice(0, Math.min(maxOnCourts, Math.floor(sorted.length / 4) * 4));
-  const waitingIds = sorted.slice(activePool.length).map(p => p.id);
-
-  const courts = [];
-  const actualCourtsCount = activePool.length / 4;
-
-  for (let c = 0; c < actualCourtsCount; c++) {
-    const pool = activePool.slice(c * 4, c * 4 + 4);
-    const combos = [
-      { t1: [pool[0].id, pool[1].id], t2: [pool[2].id, pool[3].id] },
-      { t1: [pool[0].id, pool[2].id], t2: [pool[1].id, pool[3].id] },
-      { t1: [pool[0].id, pool[3].id], t2: [pool[1].id, pool[2].id] },
-    ];
-    let best = combos[0], bestScore = Infinity;
-    combos.forEach(combo => {
-      const diff = Math.abs(tavg(combo.t1) - tavg(combo.t2));
-      const ppPen = [pk(combo.t1[0], combo.t1[1]), pk(combo.t2[0], combo.t2[1])].filter(k => pp.includes(k)).length * 20;
-      const mpPen = pm.includes(mk(combo.t1, combo.t2)) ? 30 : 0;
-      if (diff + ppPen + mpPen < bestScore) { bestScore = diff + ppPen + mpPen; best = combo; }
-    });
-    courts.push(best);
-  }
-  return { courts, waiting: waitingIds };
+    const courts = [];
+    for (let i = 0; i < activeIds.length / 4; i++) {
+        const pool = activeIds.slice(i * 4, i * 4 + 4);
+        const combos = [
+            { t1: [pool[0], pool[1]], t2: [pool[2], pool[3]] },
+            { t1: [pool[0], pool[2]], t2: [pool[1], pool[3]] },
+            { t1: [pool[0], pool[3]], t2: [pool[1], pool[2]] }
+        ];
+        let best = combos[0], minScore = Infinity;
+        combos.forEach(c => {
+            const score = Math.abs(tavg(c.t1) - tavg(c.t2)) + 
+                          ([pk(c.t1[0], c.t1[1]), pk(c.t2[0], c.t2[1])].filter(k => pp.includes(k)).length * 20);
+            if (score < minScore) { minScore = score; best = c; }
+        });
+        courts.push(best);
+    }
+    return { courts, waiting: waitingIds };
 }
 
-/* ── ОНОВЛЕННЯ РЕЙТИНГУ (ELO) ── */
-function applyScore(t1,t2,s1,s2){
-  const gap=tavg(t1)-tavg(t2);
-  const exp1=1/(1+Math.pow(10,-gap/20));
-  const act1=s1>s2?1:0;
-  const margin=Math.abs(s1-s2);
-  const K=8*(1+(margin/Math.max(s1+s2,1))*0.8);
-  [...t1,...t2].forEach(id=>{
-    const p=GP(id);
-    const inT1=t1.includes(id);
-    const act=inT1?act1:1-act1;
-    const exp=inT1?exp1:1-exp1;
-    const delta=K*(act-exp);
-    p.rating=Math.max(1,Math.min(99,p.rating+delta));
-    if(act>0.5) p.wins++; else p.losses++;
-    p.gamesPlayed++;
-    ses.ratingDeltas.push({id,delta});
-  });
+/* ── РЕНДЕР ── */
+function R() {
+    const app = document.getElementById('app');
+    if (screen === 'home') app.innerHTML = renderHome();
+    else if (screen === 'session') app.innerHTML = renderSession();
 }
 
-/* ── ВІДОБРАЖЕННЯ ── */
-function R(){ document.getElementById('app').innerHTML = html(); }
-
-function html(){
-  let out = modal ? buildModal() : '';
-  if(screen==='home')    out += homeScreen();
-  if(screen==='session') out += sessionScreen();
-  if(screen==='stats')   out += statsScreen();
-  return out;
+function renderHome() {
+    return `
+    <div class="card">
+        <h2>🏸 Бадмінтон</h2>
+        <div style="margin-bottom:15px">
+            <label style="display:block;font-size:12px;color:#666">КІЛЬКІСТЬ КОРТІВ</label>
+            <select id="sel_courts" style="padding:8px;border-radius:6px;width:120px">
+                <option value="1">1 корт</option>
+                <option value="2" selected>2 корти</option>
+                <option value="3">3 корти</option>
+            </select>
+        </div>
+        <div id="chk_list">
+            ${db.players.map(p => `
+                <div class="player-row">
+                    <input type="checkbox" value="${p.id}" checked>
+                    <div class="avatar" style="background:#e9ecef;color:${rc(p.rating)}">${ini(p.name)}</div>
+                    <span style="flex:1">${p.name}</span>
+                    <div class="rbar"><div class="rfill" style="width:${p.rating}%;background:${rc(p.rating)}"></div></div>
+                    <b style="width:30px;text-align:right">${Math.round(p.rating)}</b>
+                </div>
+            `).join('')}
+        </div>
+        <button class="btn btn-primary" style="margin-top:15px;width:100%" onclick="doStart()">▶ Розпочати день</button>
+    </div>`;
 }
 
-function homeScreen(){
-  const ps=db.players;
-  return `<div style="padding:1rem 0">
-  <h2>🏸 Бадмінтон</h2>
-  <div class="card">
-    <h3>Новий ігровий день</h3>
-    <div style="margin-bottom:12px">
-      <div class="slbl">Кількість кортів</div>
-      <select id="sel_courts" style="width: auto">
-        <option value="1">1 корт</option>
-        <option value="2" selected>2 корти</option>
-        <option value="3">3 корти</option>
-      </select>
+function renderSession() {
+    let content = '';
+    if (tab === 'courts') {
+        content = ses.courts.map((c, i) => `
+            <div class="court-block">
+                <h3>Корт ${i + 1}</h3>
+                <div class="row" style="margin-bottom:15px">
+                    <div class="team-box">${c.match.t1.map(GN).join(' + ')}</div>
+                    <div style="color:#adb5bd">VS</div>
+                    <div class="team-box">${c.match.t2.map(GN).join(' + ')}</div>
+                </div>
+                <div class="row" style="justify-content:center">
+                    <input type="number" class="score-inp" id="s1_${i}" placeholder="0">
+                    <div style="font-size:24px">:</div>
+                    <input type="number" class="score-inp" id="s2_${i}" placeholder="0">
+                    <button class="btn btn-success" onclick="doScore(${i})">OK</button>
+                </div>
+            </div>
+        `).join('');
+    } else if (tab === 'queue') {
+        content = ses.waiting.length ? ses.waiting.map(id => `<div class="player-row"><span>${GN(id)}</span></div>`).join('') : 'Черга порожня';
+    }
+
+    return `
+    <div class="tab-bar">
+        <button class="tab ${tab==='courts'?'active':''}" onclick="setTab('courts')">Корти</button>
+        <button class="tab ${tab==='queue'?'active':''}" onclick="setTab('queue')">Черга (${ses.waiting.length})</button>
+        <button class="btn btn-sm" onclick="location.reload()">Завершити день</button>
     </div>
-    <div class="slbl">Гравці сьогодні</div>
-    <div id="chk_list">
-      ${ps.map(p=>`
-      <div class="player-row">
-        <input type="checkbox" id="chk${p.id}" value="${p.id}" checked>
-        <div class="avatar" style="background:${abg(p.rating)};color:${afg(p.rating)}">${ini(p.name)}</div>
-        <span style="flex:1;font-size:14px">${p.name}</span>
-        <div class="rbar"><div class="rfill" style="width:${p.rating}%;background:${rc(p.rating)}"></div></div>
-        <span style="font-size:13px;font-weight:500;min-width:26px;text-align:right">${Math.round(p.rating)}</span>
-      </div>`).join('')}
-    </div>
-    <div class="row" style="margin-top:12px;gap:8px">
-      <button class="btn btn-primary" onclick="doStart()">▶ Розпочати день</button>
-      <button class="btn" onclick="openAdd()">+ Новий гравець</button>
-      <button class="btn" onclick="goStats()">Статистика</button>
-    </div>
-  </div>
-  </div>`;
+    ${content}`;
 }
 
-function sessionScreen(){
-  return `<div style="padding:1rem 0">
-  <div class="row" style="margin-bottom:1rem">
-    <h2 style="flex:1">Ігровий день</h2>
-    <button class="btn btn-sm" onclick="endDay()">Завершити день</button>
-  </div>
-  <div class="tab-bar">
-    <button class="tab ${tab==='courts'?'active':''}" onclick="setTab('courts')">Корти</button>
-    <button class="tab ${tab==='queue'?'active':''}"  onclick="setTab('queue')">Черга (${ses.waiting.length})</button>
-    <button class="tab ${tab==='log'?'active':''}"    onclick="setTab('log')">Ігри (${ses.log.length})</button>
-  </div>
-  ${tab==='courts'?courtsTab():tab==='queue'?queueTab():logTab()}
-  </div>`;
-}
+/* ── ЛОГІКА КНОПОК ── */
+window.doStart = function() {
+    const checked = [...document.querySelectorAll('#chk_list input:checked')].map(el => parseInt(el.value));
+    if (checked.length < 4) return alert('Треба мінімум 4 гравці!');
+    
+    const num = parseInt(document.getElementById('sel_courts').value);
+    ses = { players: checked, prevPairs: [], prevMatches: [], log: [] };
+    
+    const { courts, waiting } = makePairings(checked, num);
+    ses.courts = courts.map(m => ({ match: m, status: 'playing' }));
+    ses.waiting = waiting;
+    
+    screen = 'session';
+    R();
+};
 
-function courtsTab(){
-  let out='';
-  ses.courts.forEach((c,ci)=>{ out+=courtBlock(c,ci); });
-  return out;
-}
-
-function courtBlock(c,ci){
-  if(!c.match) return `<div class="court-block"><span style="color:#666">Корт ${ci+1} очікує</span></div>`;
-  const {team1,team2}=c.match;
-  const t1n=team1.map(GN).join(' + '), t2n=team2.map(GN).join(' + ');
-
-  if(c.status==='done') return `<div class="court-block">Корт ${ci+1}: Завершено.</div>`;
-
-  return `<div class="court-block">
-    <h3>Корт ${ci+1}</h3>
-    <div class="row" style="margin-bottom:10px">
-      <div class="team-box">${t1n}</div>
-      <span>VS</span>
-      <div class="team-box">${t2n}</div>
-    </div>
-    <div class="row">
-      <input class="score-inp" type="number" id="s1c${ci}" placeholder="0">
-      <span>:</span>
-      <input class="score-inp" type="number" id="s2c${ci}" placeholder="0">
-      <button class="btn btn-success btn-sm" onclick="doScore(${ci})">Записати</button>
-    </div>
-  </div>`;
-}
-
-function queueTab(){
-  return `<div class="card"><h3>В черзі: ${ses.waiting.length}</h3></div>`;
-}
-
-function logTab(){
-  return `<div class="card"><h3>Історія ігор</h3></div>`;
-}
-
-function statsScreen(){
-  return `<div class="card"><h2>Рейтинг</h2><button class="btn" onclick="screen='home';R()">Назад</button></div>`;
-}
-
-/* ── МОДАЛЬНІ ВІКНА ── */
-function buildModal(){
-  if(modal==='addPlayer') return `<div class="modal-wrap" onclick="closeModal()"><div class="modal" onclick="event.stopPropagation()"><h3>Додати гравця</h3><button class="btn" onclick="closeModal()">Закрити</button></div></div>`;
-  if(modal==='endDay') return `<div class="modal-wrap"><div class="modal"><h3>Завершити день?</h3><button class="btn btn-primary" onclick="confirmEnd()">Так</button><button class="btn" onclick="closeModal()">Ні</button></div></div>`;
-  return '';
-}
-
-/* ── ДІЇ ── */
-function doStart(){
-  const numCourts = parseInt(document.getElementById('sel_courts').value);
-  const checked = [...document.querySelectorAll('#chk_list input[type=checkbox]:checked')].map(el=>parseInt(el.value));
-  if(checked.length<4){ alert('Потрібно мінімум 4 гравці'); return; }
-
-  ses = { players: checked, numCourts, courts: [], waiting: [], log: [], ratingDeltas: [], prevPairs: [], prevMatches: [] };
-  const {courts,waiting} = makePairings(checked, numCourts);
-  ses.courts = courts.map(c=>({match:c, status:'playing'}));
-  ses.waiting = waiting;
-  screen='session'; R();
-}
-
-function doScore(ci){
-  const s1=parseInt(document.getElementById('s1c'+ci).value);
-  const s2=parseInt(document.getElementById('s2c'+ci).value);
-  if(isNaN(s1)||isNaN(s2)) return;
-  const c=ses.courts[ci];
-  applyScore(c.match.team1, c.match.team2, s1, s2);
-  ses.log.push({court:ci, score1:s1, score2:s2});
-  ses.courts[ci].status='done';
-  saveDB(); R();
-}
-
-function openAdd(){ modal='addPlayer'; R(); }
-function endDay(){ modal='endDay'; R(); }
-function confirmEnd(){ ses=null; modal=null; screen='home'; R(); }
-function closeModal(){ modal=null; R(); }
-function setTab(t){ tab=t; R(); }
-function goStats(){ screen='stats'; R(); }
-
-R();
-</script>
-</body>
-</html>
+window.doScore = function(idx) {
+    const s1 = parseInt(document.getElementById(`s1_${idx}`).value);
+    const s2 = parseInt(document.getElementById(`s2_${idx}`).value);
+    if (
