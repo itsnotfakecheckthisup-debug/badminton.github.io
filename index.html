@@ -181,4 +181,21 @@ window.doStart = function() {
 window.doScore = function(idx) {
     const s1 = parseInt(document.getElementById(`s1_${idx}`).value);
     const s2 = parseInt(document.getElementById(`s2_${idx}`).value);
-    if (
+    if (isNaN(s1) || isNaN(s2)) return alert('Введіть рахунок');
+    
+    // Оновлення рейтингу (спрощено для прикладу)
+    const court = ses.courts[idx];
+    const winT = s1 > s2 ? court.match.t1 : court.match.t2;
+    winT.forEach(id => { let p = GP(id); p.rating = Math.min(100, p.rating + 1); p.wins++; });
+    
+    alert(`Гру завершено! Рахунок ${s1}:${s2}`);
+    saveDB();
+    location.reload(); // Для простоти перезавантажимо, щоб скинути стейт
+};
+
+window.setTab = (t) => { tab = t; R(); };
+
+R();
+</script>
+</body>
+</html>
